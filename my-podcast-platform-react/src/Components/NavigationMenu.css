@@ -1,0 +1,21 @@
+.navigation-menu .navbar-nav {
+    margin-left: auto;
+  }
+  
+  
+  .nav-link-custom {
+    color: darkred !important;  
+    font-weight: bold;         
+  }
+  
+  .nav-link-custom:hover {
+    color: #5e0505 !important;  
+  }
+  
+.navbar-brand {
+    color: darkred !important;
+}
+
+.navbar-brand:hover {
+    color: #38109f !important;  
+  }
