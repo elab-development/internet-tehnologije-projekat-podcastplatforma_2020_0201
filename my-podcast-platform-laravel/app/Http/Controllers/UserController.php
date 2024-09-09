@@ -73,5 +73,30 @@ public function register(Request $request)
         }
     }
 
+    public function changePassword(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'new_password' => 'required|min:8|confirmed',
+    ]);
+
+    $user = User::where('email', $request->email)->first();
+
+    if (!$user) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
+
+    $user->password = Hash::make($request->new_password);
+    $user->save();
+
+    return response()->json(['message' => 'Password changed successfully'], 200);
+}
+
+public function getUserLikes(Request $request){
+    $user = Auth::user();
+    $likes = $user->likes;
+    return response()->json($likes);
+}
+
 
 }
