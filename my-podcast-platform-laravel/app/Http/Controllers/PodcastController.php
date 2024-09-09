@@ -38,4 +38,34 @@ class PodcastController extends Controller
 
         return response()->json($podcasts, 200);
     }
+
+    public function uploadPodcast(Request $request)
+{
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'video' => 'required|file|mimes:mp4,mkv,avi',
+        'category' => 'required|string|max:255',
+        'email' => 'required|email',
+    ]);
+
+    $email = $request->input('email');
+
+    $user = User::where('email', $email)->first();
+
+    if (!$user) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
+
+    $path = $request->file('video')->store('videos', 'public');
+
+    DB::table('podcasts')->insert([
+        'user_id' => $user->id,
+        'title' => $request->title,
+        'video_url' => $path,
+        'category' => $request->category,
+    ]);
+
+    return response()->json(['message' => 'Podcast uploaded successfully'], 201);
+}
+
 }
