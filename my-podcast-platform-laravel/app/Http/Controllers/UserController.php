@@ -29,4 +29,49 @@ class UserController extends Controller
     return response()->json(['token' => $token, 'user' => $user], 200);
 }
 
+public function register(Request $request)
+    {
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8|confirmed',
+                'role' => 'required|string|in:viewer,administrator,host',
+            ]);
+
+            $password = Hash::make($request->password);
+
+            if ($request->role === 'administrator') {
+                DB::table('users_waiting_approval')->insert([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => $password,
+                    'role' => $request->role,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                return response()->json(['message' => 'Registration successful, awaiting admin approval'], 201);
+            } else {
+                $user = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => $password,
+                    'role' => $request->role,
+                ]);
+
+                $token = $user->createToken('authToken')->plainTextToken;
+
+                return response()->json(['token' => $token, 'user' => $user], 201);
+            }
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => 'requestNotValid',
+                'message' => $e->errors()
+            ], 400);
+        }
+    }
+
+
 }
