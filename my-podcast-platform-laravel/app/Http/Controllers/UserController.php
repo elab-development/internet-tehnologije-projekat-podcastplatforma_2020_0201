@@ -98,5 +98,30 @@ public function getUserLikes(Request $request){
     return response()->json($likes);
 }
 
+public function approveUser(Request $request)
+    {
+        $validatedData = $request->validate(['email' => 'required|email']);
+
+        $waitingUser = DB::select('SELECT * FROM users_waiting_approval WHERE email = ?', [$validatedData['email']]);
+        if ($waitingUser) {
+            DB::transaction(function () use ($waitingUser) {
+                DB::insert('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [
+                    $waitingUser[0]->name, $waitingUser[0]->email, $waitingUser[0]->password
+                ]);
+                DB::delete('DELETE FROM users_waiting_approval WHERE email = ?', [$waitingUser[0]->email]);
+            });
+
+            return response()->json(['message' => 'User approved successfully'], 200);
+        }
+
+        return response()->json(['error' => 'User not found'], 404);
+    }
+
+       public function getUsersToApprove()
+    {
+        $users = DB::table('users_waiting_approval')->get();
+
+        return response()->json($users);
+    }
 
 }
