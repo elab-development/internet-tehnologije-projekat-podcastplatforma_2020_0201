@@ -39,6 +39,7 @@ class PodcastController extends Controller
         return response()->json($podcasts, 200);
     }
 
+
     public function uploadPodcast(Request $request)
 {
     $request->validate([
@@ -68,17 +69,47 @@ class PodcastController extends Controller
     return response()->json(['message' => 'Podcast uploaded successfully'], 201);
 }
 
-public function getUserPodcasts()
-{
-    $podcasts = DB::select('
-        SELECT p.*,
-            (SELECT COUNT(*) FROM likes WHERE podcast_id = p.id) AS likes,
-            (SELECT COUNT(*) FROM comments WHERE podcast_id = p.id) AS comments
-        FROM podcasts p WHERE p.user_id = ?
-    ', [auth()->id()]);
 
-    return response()->json($podcasts);
-}
+    public function getUserPodcasts()
+    {
+        $podcasts = DB::select('
+            SELECT p.*,
+                (SELECT COUNT(*) FROM likes WHERE podcast_id = p.id) AS likes,
+                (SELECT COUNT(*) FROM comments WHERE podcast_id = p.id) AS comments
+            FROM podcasts p WHERE p.user_id = ?
+        ', [auth()->id()]);
 
+        return response()->json($podcasts);
+    }
 
+    public function fetchTrendingPodcasts(Request $request)
+    {
+        $apiUrl = 'https://itunes.apple.com/search';
+        $term = $request->input('term', 'trending');
+
+        $response = Http::get($apiUrl, [
+            'term' => $term,
+            'entity' => 'podcast',
+            'limit' => 10,
+        ]);
+
+        if ($response->successful()) {
+            $data = $response->json();
+            $podcasts = $data['results'];
+
+            $processedPodcasts = array_map(function ($podcast) {
+                return [
+                    'collectionName' => $podcast['collectionName'],
+                    'collectionId' => $podcast['collectionId'],
+                    'artistName' => $podcast['artistName'],
+                    'feedUrl' => $podcast['feedUrl'] ?? null,
+                    'artworkUrl100' => $podcast['artworkUrl100'] ?? null
+                ];
+            }, $podcasts);
+
+            return response()->json($processedPodcasts);
+        } else {
+            return response()->json(['error' => 'Failed to fetch data'], $response->status());
+        }
+    }
 }
