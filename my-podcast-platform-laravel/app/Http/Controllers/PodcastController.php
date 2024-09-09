@@ -68,4 +68,17 @@ class PodcastController extends Controller
     return response()->json(['message' => 'Podcast uploaded successfully'], 201);
 }
 
+public function getUserPodcasts()
+{
+    $podcasts = DB::select('
+        SELECT p.*,
+            (SELECT COUNT(*) FROM likes WHERE podcast_id = p.id) AS likes,
+            (SELECT COUNT(*) FROM comments WHERE podcast_id = p.id) AS comments
+        FROM podcasts p WHERE p.user_id = ?
+    ', [auth()->id()]);
+
+    return response()->json($podcasts);
+}
+
+
 }
