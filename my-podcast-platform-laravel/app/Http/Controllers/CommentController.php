@@ -27,6 +27,30 @@ class CommentController extends Controller
         'comment' => 'required|string|max:1000',
     ]);
 
+    DB::insert('INSERT INTO comments (user_id, podcast_id, text) VALUES (?, ?, ?)', [
+        auth()->id(),
+        $request->podcast_id,
+        $request->comment,
+    ]);
+
+    return response()->json(['message' => 'Comment added successfully'], 201);
+
+}
+
+public function getComments($podcastId, Request $request)
+{
+    $request->validate([
+        'podcast_id' => 'required|integer|exists:podcasts,id',
+    ]);
+
+    $comments = DB::select('
+        SELECT c.*, u.email
+        FROM comments c
+        JOIN users u ON c.user_id = u.id
+        WHERE c.podcast_id = ?
+    ', [$podcastId]);
+
+    return response()->json($comments);
 }
 
 }
