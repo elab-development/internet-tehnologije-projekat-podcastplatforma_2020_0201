@@ -53,4 +53,25 @@ public function getComments($podcastId, Request $request)
     return response()->json($comments);
 }
 
+public function likePodcast(Request $request)
+{
+    $request->validate([
+        'podcast_id' => 'required|integer|exists:podcasts,id',
+    ]);
+
+    $existingLike = DB::select('SELECT * FROM likes WHERE user_id = ? AND podcast_id = ?', [auth()->id(), $request->podcast_id]);
+
+    if ($existingLike) {
+        return response()->json(['message' => 'You have already liked this podcast'], 400);
+    }
+
+    DB::insert('INSERT INTO likes (user_id, podcast_id) VALUES (?, ?)', [
+        auth()->id(),
+        $request->podcast_id,
+    ]);
+
+    return response()->json(['message' => 'Podcast liked successfully'], 201);
+}
+
+
 }
