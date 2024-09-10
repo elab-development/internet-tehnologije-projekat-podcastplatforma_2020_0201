@@ -3,6 +3,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class CommentController extends Controller
 {
@@ -37,20 +39,42 @@ class CommentController extends Controller
 
 }
 
-public function getComments($podcastId, Request $request)
+public function getComments($podcastId)
 {
-    $request->validate([
-        'podcast_id' => 'required|integer|exists:podcasts,id',
-    ]);
+    try{
 
-    $comments = DB::select('
-        SELECT c.*, u.email
-        FROM comments c
-        JOIN users u ON c.user_id = u.id
-        WHERE c.podcast_id = ?
-    ', [$podcastId]);
+       
+        // $request->validate([
+        //     'podcastId' => 'required|integer|exists:podcasts,id',
+        // ]);
 
-    return response()->json($comments);
+        $validator = Validator::make(['podcast_id' => $podcastId], [
+            'podcast_id' => 'required|integer|exists:podcasts,id',
+        ]);
+
+        if ($validator->fails()) {
+            
+            throw new ValidationException($validator);
+        }
+        
+
+    
+        $comments = DB::select(
+            'SELECT c.*, u.email
+             FROM comments c
+             JOIN users u ON c.user_id = u.id
+             WHERE c.podcast_id = ?', 
+             [$podcastId]
+            );
+    
+        return response()->json($comments,201);
+    }catch (ValidationException $e) {
+        return response()->json([
+            'error' => 'requestNotValid',
+            'message' => $e->errors()
+        ], 400);
+    }
+   
 }
 
 public function likePodcast(Request $request)

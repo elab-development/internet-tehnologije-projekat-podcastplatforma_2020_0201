@@ -13,11 +13,11 @@ class PodcastController extends Controller
     public function getAllPodcasts()
     {
         $podcasts = DB::select(
-            'SELECT p.*, COUNT(l.id) as likes, COUNT(c.id) as comments
+            'SELECT p.id,p.user_id,p.title,p.description, COUNT(l.id) as likes, COUNT(c.id) as comments
              FROM podcasts p
              LEFT JOIN likes l ON l.podcast_id = p.id
              LEFT JOIN comments c ON c.podcast_id = p.id
-             GROUP BY p.id'
+             GROUP BY p.id, p.user_id, p.title, p.description' 
         );
 
         return response()->json($podcasts, 200);
@@ -27,12 +27,12 @@ class PodcastController extends Controller
     public function getPodcastsByCategory($category)
     {
         $podcasts = DB::select(
-            'SELECT p.*, COUNT(l.id) as likes, COUNT(c.id) as comments
+            'SELECT p.id,p.user_id,p.title,p.description, COUNT(l.id) as likes, COUNT(c.id) as comments
              FROM podcasts p
              LEFT JOIN likes l ON l.podcast_id = p.id
              LEFT JOIN comments c ON c.podcast_id = p.id
              WHERE p.category = ?
-             GROUP BY p.id',
+             GROUP BY p.id,p.user_id,p.title,p.description',
             [$category]
         );
 
