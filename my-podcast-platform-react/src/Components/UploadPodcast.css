@@ -1,0 +1,38 @@
+/* UploadPodcast.css */
+
+.upload-podcast {
+    background-color: beige; 
+    color: black; 
+    padding: 20px; 
+    min-height: 100vh;
+  }
+  
+  .upload-content {
+    max-width: 600px; 
+    margin: 0 auto; 
+    text-align: center;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column; 
+    gap: 20px; 
+  }
+  
+  input[type="file"] {
+    margin-bottom: 10px; 
+  }
+  
+  button {
+    padding: 10px 20px; 
+    background-color: #4CAF50; 
+    color: white; 
+    border: none; 
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #45a049; 
+  }
+  

@@ -1,0 +1,55 @@
+.host-profile {
+    background-color: beige; 
+    color: black; 
+    padding: 20px; 
+    min-height: 100vh; 
+  }
+  
+  .videos-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; 
+    justify-content: center; 
+  }
+  
+  .video-card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    width: 300px; 
+    text-align: center;
+  }
+  
+  .video-player {
+    width: 100%;
+    height: 200px; 
+  }
+  
+  .video-info {
+    padding: 10px;
+  }
+  
+  .video-likes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .like-button {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+  }
+  
+  .comments {
+    margin-top: 10px;
+  }
+  
+  .comment {
+    padding: 5px;
+    border-top: 1px solid #ddd;
+  }
+  
