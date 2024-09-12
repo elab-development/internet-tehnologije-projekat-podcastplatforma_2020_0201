@@ -93,9 +93,108 @@ function * changePasswordSaga(action: any){
 }
 
 
+function* getUsersToApprove(action:any){
+  try {
+      const token = action.payload;
+      const response: AxiosResponse<any> = yield call(axios.get, `${API_URL}admin/approve-users`, {
+          headers: {
+              'Authorization': `Bearer ${token}`,
+          }
+      });
+      if (response.status === 200) {
+        yield put(setUsersToApprove(response.data.users));
+        yield put(setApiCallError("OK"));
+      }
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+      if (axiosError.response) {
+        const errorData = axiosError.response.data as ErrorResponse;
+        yield put(setApiCallError(errorData.error));
+      } else {
+        yield put(setApiCallError(axiosError.message));
+      }
+    }
+}
+
+function* approveUserSaga(action: any) {
+  try {
+    const {email, token} = action.payload;
+    const response: AxiosResponse<any> = yield call(axios.post, `${API_URL}admin/approve-user/${email}`, {
+      email: email
+    }, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      }
+    });
+
+    if (response.status === 201) {
+      alert("User approved!");
+      window.location.reload();
+      yield put(setApiCallError("OK"));
+    }
+  } catch (error) {
+    const axiosError = error as AxiosError<ErrorResponse>;
+    if (axiosError.response) {
+      const errorData = axiosError.response.data as ErrorResponse;
+      yield put(setApiCallError(errorData.error));
+      alert(`Failed to like podcast: ${errorData.error}`);
+    } else {
+      yield put(setApiCallError(axiosError.message));
+      alert(`Failed to like podcast: ${axiosError.message}`);
+    }
+  }
+}
+
+function* rejectUserToApprove(action:any){
+  try{
+    const { email, token } = action.payload;
+    const response: AxiosResponse<any> = yield call(axios.delete, `${API_URL}admin/reject-user/${email}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      }
+    });
+
+    if (response.status === 200) {
+      yield put(setApiCallError("OK"));
+      alert("Rejected!");
+      window.location.reload();
+    }
+  } catch (error) {
+    const axiosError = error as AxiosError<ErrorResponse>;
+    if (axiosError.response) {
+      const errorData = axiosError.response.data as ErrorResponse;
+      yield put(setApiCallError(errorData.error));
+    } else {
+      yield put(setApiCallError(axiosError.message));
+    }
+  }
+
+}
+function* getTrendingPodcasts(action: any) {
+  try {
+    const response: AxiosResponse<any> = yield call(axios.get, `${API_URL}trending-podcasts`);
+
+    if (response.status === 200) {
+      yield put(setTPS(response.data.tps));
+    }
+  } 
+  catch (error) {
+    const axiosError = error as AxiosError<ErrorResponse>;
+    if (axiosError.response) {
+      const errorData = axiosError.response.data as ErrorResponse;
+      yield put(setApiCallError(errorData.error));
+    } else {
+      yield put(setApiCallError(axiosError.message));
+    }
+    }
+  }
 export default function* welcomeSaga() {
   yield takeEvery('LOGIN_REQUEST', loginSaga);
   yield takeEvery('CHANGE_PASSWORD', changePasswordSaga);
   yield takeEvery('REGISTER_USER', registerSaga);
-
+  yield takeEvery('REQUEST_USERS_TO_APPROVE', getUsersToApprove);
+  yield takeLatest('APPROVE_NEW_ADMIN', approveUserSaga);
+  yield takeLatest('REJECT_NEW_ADMIN', rejectUserToApprove);
+  yield takeEvery('GET_TPS', getTrendingPodcasts);
 }
+
