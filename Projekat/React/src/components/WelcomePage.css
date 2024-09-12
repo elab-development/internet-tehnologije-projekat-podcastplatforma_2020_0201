@@ -1,0 +1,37 @@
+.login-page {
+    background-image: url('../../public/assets/pocetna.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .welcome-message {
+    color: #b04a49; 
+    margin-bottom: 1rem;
+  }
+  
+  .info-box {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .form-box {
+    margin-top: 1rem;
+  }
+
+  .clickable-text {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  
+  .clickable-text:hover {
+    color: darkblue;
+  }
+  
+  
