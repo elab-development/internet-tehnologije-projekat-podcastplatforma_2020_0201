@@ -90,36 +90,36 @@ class PodcastController extends Controller
 
 
     public function fetchTrendingPodcasts(Request $request)
-    {
-        $apiUrl = 'https://itunes.apple.com/search';
-$term = $request->input('term', 'trending');
+{
+    $apiUrl = 'https://itunes.apple.com/search';
+    $term = $request->input('term', 'trending');
 
-$response = Http::get($apiUrl, [
-    'term' => $term,
-    'entity' => 'podcast',
-    'limit' => 50,
-]);
+    // Poziv API-ju
+    $response = Http::get($apiUrl, [
+        'term' => $term,
+        'entity' => 'podcast',
+        'limit' => 50,
+    ]);
 
-if ($response->successful()) {
-    $data = $response->json();
-    $podcasts = $data['results'];
+    if ($response->successful()) {
+        $data = $response->json();
+        $podcasts = $data['results'] ?? [];
 
-    $processedPodcasts = array_map(function ($podcast) {
-        return [
-            'collectionName' => $podcast['collectionName'],
-            'collectionId' => $podcast['collectionId'],
-            'artistName' => $podcast['artistName'],
-            'feedUrl' => $podcast['feedUrl'] ?? null,
-            'artworkUrl100' => $podcast['artworkUrl100'] ?? null,
-            'genre' => $podcast['primaryGenreName'] ?? 'Unknown',
-            'genreId' => $podcast['primaryGenreId'] ?? null
-        ];
-    }, $podcasts);
+        $processedPodcasts = array_map(function ($podcast) {
+            return [
+                'collectionName' => $podcast['collectionName'] ?? 'Unknown Collection',
+                'collectionId' => $podcast['collectionId'] ?? 'Unknown ID',
+                'artistName' => $podcast['artistName'] ?? 'Unknown Artist',
+                'feedUrl' => $podcast['feedUrl'] ?? null,
+                'artworkUrl100' => $podcast['artworkUrl100'] ?? null,
+                'genre' => $podcast['primaryGenreName'] ?? 'Unknown Genre',
+                'genreId' => $podcast['primaryGenreId'] ?? null
+            ];
+        }, $podcasts);
 
-    return response()->json(['tps' => $processedPodcasts], 200);
-} else {
-    return response()->json(['error' => 'Failed to fetch data'], $response->status());
-}
-
+        return response()->json(['trendingPodcasts' => $processedPodcasts], 200);
+    } else {
+        return response()->json(['error' => 'Failed to fetch data'], $response->status());
     }
+}
 }

@@ -100,8 +100,8 @@ class UserController extends Controller
         $waitingUser = DB::select('SELECT * FROM users_waiting_approval WHERE email = ?', [$validatedData['email']]);
         if ($waitingUser) {
             DB::transaction(function () use ($waitingUser) {
-                DB::insert('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [
-                    $waitingUser[0]->name, $waitingUser[0]->email, $waitingUser[0]->password
+                DB::insert('INSERT INTO users (name, email, password,role) VALUES (?, ?, ?,?)', [
+                    $waitingUser[0]->name, $waitingUser[0]->email, $waitingUser[0]->password,$waitingUser[0]->role
                 ]);
                 DB::delete('DELETE FROM users_waiting_approval WHERE email = ?', [$waitingUser[0]->email]);
             });

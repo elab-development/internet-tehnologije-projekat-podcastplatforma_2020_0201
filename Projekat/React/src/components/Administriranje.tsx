@@ -1,10 +1,19 @@
-import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
-import { deleteComment, fetchAllComments, fetchPodcastsRequest } from '../store/actions/appActions';
-import { RootState } from '../store/reducers';
-import './AdministriranjeStranice.css'; 
-import { approveNewAdmin, approveRegistration, rejectNewAdmin, requestUsersToApprove } from '../store/actions/welcomeActions';
-import NavigationMenu from './NavigationMenu';
+import React, { useEffect } from "react";
+import { connect } from "react-redux";
+import {
+  deleteComment,
+  fetchAllComments,
+  fetchPodcastsRequest,
+} from "../store/actions/appActions";
+import { RootState } from "../store/reducers";
+import "./AdministriranjeStranice.css";
+import {
+  approveNewAdmin,
+  approveRegistration,
+  rejectNewAdmin,
+  requestUsersToApprove,
+} from "../store/actions/welcomeActions";
+import NavigationMenu from "./NavigationMenu";
 
 interface Comment {
   id: number;
@@ -43,7 +52,7 @@ const AdministriranjeStranice: React.FC<AdminPageProps> = ({
   rejectNewAdmin,
   approveNewAdmin,
   podcasts,
-  token
+  token,
 }) => {
   useEffect(() => {
     fetchAllComments(token);
@@ -56,16 +65,16 @@ const AdministriranjeStranice: React.FC<AdminPageProps> = ({
   };
 
   const handleReject = (mail: string) => {
-    rejectNewAdmin(mail,token);
+    rejectNewAdmin(mail, token);
   };
 
-  const handleDeleteComment = (comment_id : number, token: string) => {
+  const handleDeleteComment = (comment_id: number, token: string) => {
     deleteComment(comment_id, token);
   };
 
   const getPodcastTitle = (podcast_id: number) => {
-    const podcast = podcasts.find(podcast => podcast.id === podcast_id);
-    return podcast ? podcast.title : 'Unknown Podcast';
+    const podcast = podcasts.find((podcast) => podcast.id === podcast_id);
+    return podcast ? podcast.title : "Unknown Podcast";
   };
 
   return (
@@ -76,7 +85,7 @@ const AdministriranjeStranice: React.FC<AdminPageProps> = ({
 
         <div className="approval-section">
           <h2>Korisnici na čekanju</h2>
-          {usersToBeApproved.length > 0 ? (
+          {usersToBeApproved?.length > 0 ? (
             <table className="admin-table">
               <thead>
                 <tr>
@@ -86,13 +95,23 @@ const AdministriranjeStranice: React.FC<AdminPageProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {usersToBeApproved.map((user, index) => ( 
+                {usersToBeApproved.map((user, index) => (
                   <tr key={index}>
                     <td>{user.email}</td>
                     <td>{user.name}</td>
                     <td>
-                      <button className="action-button approve-button" onClick={() => handleApprove(user.email)}>Approve</button>
-                      <button className="action-button reject-button" onClick={() => handleReject(user.email)}>Reject</button>
+                      <button
+                        className="action-button approve-button"
+                        onClick={() => handleApprove(user.email)}
+                      >
+                        Approve
+                      </button>
+                      <button
+                        className="action-button reject-button"
+                        onClick={() => handleReject(user.email)}
+                      >
+                        Reject
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -105,7 +124,7 @@ const AdministriranjeStranice: React.FC<AdminPageProps> = ({
 
         <div className="comments-section">
           <h2>All Comments</h2>
-          {allComments.length > 0 ? (
+          {allComments?.length > 0 ? (
             <table className="admin-table">
               <thead>
                 <tr>
@@ -119,10 +138,14 @@ const AdministriranjeStranice: React.FC<AdminPageProps> = ({
                 {allComments.map((comment, index) => (
                   <tr key={index}>
                     <td>{comment.user_name}</td>
-                    <td>{getPodcastTitle(comment.podcast_id)}</td> 
+                    <td>{getPodcastTitle(comment.podcast_id)}</td>
                     <td>{comment.text}</td>
                     <td>
-                      <button onClick={() => handleDeleteComment(comment.id, token)}>Delete</button>
+                      <button
+                        onClick={() => handleDeleteComment(comment.id, token)}
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -140,19 +163,25 @@ const AdministriranjeStranice: React.FC<AdminPageProps> = ({
 const mapStateToProps = (state: RootState) => ({
   usersToBeApproved: state.welcome.usersToBeApproved,
   allComments: state.appRed.allComments,
-  token: state.welcome.currentUser?.token || '',
-  podcasts: state.appRed.podcasts || []
+  token: state.welcome.currentUser?.token || "",
+  podcasts: state.appRed.podcasts || [],
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
   approveRegistration: (user: any) => dispatch(approveRegistration(user)),
-  deleteComment: (comment_id: number, token: string) => dispatch(deleteComment(comment_id, token)),
+  deleteComment: (comment_id: number, token: string) =>
+    dispatch(deleteComment(comment_id, token)),
   fetchAllComments: (token: string) => dispatch(fetchAllComments(token)),
   fetchAllPodcasts: (token: string) => dispatch(fetchPodcastsRequest(token)),
-  requestUsersToApprove: (token: string) => dispatch(requestUsersToApprove(token)),
-  approveNewAdmin: (email: string, token: string) => dispatch(approveNewAdmin(email,token)),
-  rejectNewAdmin: (email: string, token: string) => dispatch(rejectNewAdmin(email,token)),
-
+  requestUsersToApprove: (token: string) =>
+    dispatch(requestUsersToApprove(token)),
+  approveNewAdmin: (email: string, token: string) =>
+    dispatch(approveNewAdmin(email, token)),
+  rejectNewAdmin: (email: string, token: string) =>
+    dispatch(rejectNewAdmin(email, token)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(AdministriranjeStranice);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AdministriranjeStranice);

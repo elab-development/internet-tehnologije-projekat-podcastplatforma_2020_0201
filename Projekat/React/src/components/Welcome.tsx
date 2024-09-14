@@ -1,74 +1,99 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Form, Container, Col, Row, Alert, Modal } from 'react-bootstrap';
-import { connect } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { RootState } from '../store/reducers';
-import './WelcomePage.css';
-
+import React, { useEffect, useState } from "react";
+import {
+  Button,
+  Form,
+  Container,
+  Col,
+  Row,
+  Alert,
+  Modal,
+} from "react-bootstrap";
+import { connect } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { RootState } from "../store/reducers";
+import "./WelcomePage.css";
+import { setRegisterResponse } from "../store/actions/welcomeActions";
 
 interface IWelcomePageProps {
-  changePassword: (credentials: {email: string, name: string, new_password: string, new_password_confirmation: string}) => void;
+  changePassword: (credentials: {
+    email: string;
+    name: string;
+    new_password: string;
+    new_password_confirmation: string;
+  }) => void;
   errorLogin: string;
   loginRequest: (credentials: { email: string; password: string }) => void;
-  user : any;
+  user: any;
   registerStatus: string;
-  registerUser: (credentials: {email: string, name: string, password: string, password_confirmation: string, role: string}) => void;
+  registerUser: (credentials: {
+    email: string;
+    name: string;
+    password: string;
+    password_confirmation: string;
+    role: string;
+  }) => void;
+  setRegisterResponse: (message: string) => void;
 }
 
-const WelcomePage: React.FC<IWelcomePageProps> = ({ user, changePassword, loginRequest, registerStatus, errorLogin, registerUser }) => {
-
-  const [showLogin, setShowLogin] = useState<boolean>(false); 
+const WelcomePage: React.FC<IWelcomePageProps> = ({
+  user,
+  changePassword,
+  loginRequest,
+  registerStatus,
+  errorLogin,
+  registerUser,
+  setRegisterResponse,
+}) => {
+  const [showLogin, setShowLogin] = useState<boolean>(false);
   const [showRegister, setShowRegister] = useState<boolean>(false);
   const [showChangePassword, setShowChangePassword] = useState<boolean>(false);
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
-  const [username, setUsername] = useState<string>('');
-  const [role, setRole] = useState<string>('viewer'); 
-  const [error, setError] = useState<string>('');
-  const [newPassword, setNewPassword] = useState<string>('');
-  const [confirmNewPassword, setConfirmNewPassword] = useState<string>('');
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
+  const [role, setRole] = useState<string>("viewer");
+  const [error, setError] = useState<string>("");
+  const [newPassword, setNewPassword] = useState<string>("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState<string>("");
   const navigate = useNavigate();
-
 
   const handleLogin = () => {
     loginRequest({ email, password });
   };
   useEffect(() => {
-    if (errorLogin ===""){
+    if (errorLogin === "") {
       setError("");
     }
-    if (errorLogin==="200"){
+    if (errorLogin === "200") {
       setError("");
     }
-    if (errorLogin==="P201"){
-      setError('Lozinka je promenjena.');
+    if (errorLogin === "P201") {
+      setError("Lozinka je promenjena.");
     }
-    if (errorLogin.includes("P4")){
-      setError('Lozinka NIJE promenjena.');
+    if (errorLogin && errorLogin.includes("P4")) {
+      setError("Lozinka NIJE promenjena.");
     }
-    if (errorLogin === "401"){
-      setError("Pogrešna lozinka.")
-    }
-    else if (errorLogin==="404"){
+    if (errorLogin === "401") {
+      setError("Pogrešna lozinka.");
+    } else if (errorLogin === "404") {
       setError("Ne postoji registracija sa tim emailom.");
     }
   }, [errorLogin]);
 
   useEffect(() => {
-    if (user!== null){
-      if (user.role === 'viewer') {
-        navigate('/viewer-home');
-      } else if (user.role === 'host') {
-        navigate('/host-home');
-      } else if (user.role === 'administrator') {
-        navigate('/admin-home');
+    if (user !== null) {
+      if (user.role === "viewer") {
+        navigate("/viewer-home");
+      } else if (user.role === "host") {
+        navigate("/host-home");
+      } else if (user.role === "administrator") {
+        navigate("/admin-home");
       }
     }
   }, [user]);
 
   useEffect(() => {
-    if (registerStatus==="REGISTROVANI STE"){
+    if (registerStatus === "REGISTROVANI STE") {
       setShowLogin(true);
     }
     setError(registerStatus);
@@ -80,19 +105,26 @@ const WelcomePage: React.FC<IWelcomePageProps> = ({ user, changePassword, loginR
 
   const handleRegister = () => {
     if (password !== confirmPassword) {
-      setError('Lozinke se ne poklapaju.');
+      setError("Lozinke se ne poklapaju.");
       return;
     }
-    
-    const newUser = { email, name: username, password, password_confirmation: confirmPassword, role };
+
+    const newUser = {
+      email,
+      name: username,
+      password,
+      password_confirmation: confirmPassword,
+      role,
+    };
     setShowRegister(false);
+    setRegisterResponse("");
     registerUser(newUser);
   };
 
   const handleRegisterRedirect = () => {
     setShowLogin(false);
     setShowRegister(true);
-    setError('');
+    setError("");
   };
 
   const handlePasswordChangeRedirect = () => {
@@ -101,12 +133,17 @@ const WelcomePage: React.FC<IWelcomePageProps> = ({ user, changePassword, loginR
 
   const handlePasswordChange = () => {
     if (newPassword !== confirmNewPassword) {
-      setError('Lozinke se ne poklapaju.');
+      setError("Lozinke se ne poklapaju.");
       return;
     }
-    
+
     setShowChangePassword(false);
-    changePassword({name: username, email: email, new_password: newPassword, new_password_confirmation: confirmNewPassword});
+    changePassword({
+      name: username,
+      email: email,
+      new_password: newPassword,
+      new_password_confirmation: confirmNewPassword,
+    });
   };
 
   return (
@@ -116,15 +153,46 @@ const WelcomePage: React.FC<IWelcomePageProps> = ({ user, changePassword, loginR
           <h1 className="welcome-message">Dobrodošli!</h1>
           <div className="info-box">
             <p>
-              Mi cenimo naše korisnike, molimo vas ulogujte se ili registrujte da biste pristupili podcast stranici.
+              Mi cenimo naše korisnike, molimo vas ulogujte se ili registrujte
+              da biste pristupili podcast stranici.
             </p>
             {error && <Alert variant="danger">{error}</Alert>}
-            {error==="Pogrešna lozinka." && <p className="clickable-text" onClick={handlePasswordChangeRedirect}> Zaboravljena lozinka?</p>}
-            {error==="Ne postoji registracija sa tim emailom." && <p className="clickable-text" onClick={handleRegisterRedirect}>Registruj se!</p>}
+            {error === "Pogrešna lozinka." && (
+              <p
+                className="clickable-text"
+                onClick={handlePasswordChangeRedirect}
+              >
+                {" "}
+                Zaboravljena lozinka?
+              </p>
+            )}
+            {error === "Ne postoji registracija sa tim emailom." && (
+              <p className="clickable-text" onClick={handleRegisterRedirect}>
+                Registruj se!
+              </p>
+            )}
             {!showLogin && !showRegister && (
               <div>
-                <Button variant="primary" className="m-2" onClick={() => { setShowLogin(true); setError("")}}>Uloguj se</Button>
-                <Button variant="secondary" className="m-2" onClick={() => { setShowRegister(true); setError("")}}>Registruj se</Button>
+                <Button
+                  variant="primary"
+                  className="m-2"
+                  onClick={() => {
+                    setShowLogin(true);
+                    setError("");
+                  }}
+                >
+                  Uloguj se
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="m-2"
+                  onClick={() => {
+                    setShowRegister(true);
+                    setError("");
+                  }}
+                >
+                  Registruj se
+                </Button>
               </div>
             )}
             {showLogin && !showRegister && !showChangePassword && (
@@ -148,7 +216,13 @@ const WelcomePage: React.FC<IWelcomePageProps> = ({ user, changePassword, loginR
                       onChange={(e) => setPassword(e.target.value)}
                     />
                   </Form.Group>
-                  <Button variant="primary" className="mt-3" onClick={handleLogin}>Prijavi se</Button>
+                  <Button
+                    variant="primary"
+                    className="mt-3"
+                    onClick={handleLogin}
+                  >
+                    Prijavi se
+                  </Button>
                 </Form>
               </div>
             )}
@@ -202,14 +276,23 @@ const WelcomePage: React.FC<IWelcomePageProps> = ({ user, changePassword, loginR
                     <option value="administrator">Administrator</option>
                   </Form.Control>
                 </Form.Group>
-                <Button variant="primary" className="mt-3" onClick={handleRegister}>Registruj se</Button>
+                <Button
+                  variant="primary"
+                  className="mt-3"
+                  onClick={handleRegister}
+                >
+                  Registruj se
+                </Button>
               </Form>
             )}
           </div>
         </Col>
       </Row>
 
-      <Modal show={showChangePassword} onHide={() => setShowChangePassword(false)}>
+      <Modal
+        show={showChangePassword}
+        onHide={() => setShowChangePassword(false)}
+      >
         <Modal.Header closeButton>
           <Modal.Title>Promeni lozinku</Modal.Title>
         </Modal.Header>
@@ -242,7 +325,13 @@ const WelcomePage: React.FC<IWelcomePageProps> = ({ user, changePassword, loginR
                 onChange={(e) => setConfirmNewPassword(e.target.value)}
               />
             </Form.Group>
-            <Button variant="primary" className="mt-3" onClick={handlePasswordChange}>Promeni lozinku</Button>
+            <Button
+              variant="primary"
+              className="mt-3"
+              onClick={handlePasswordChange}
+            >
+              Promeni lozinku
+            </Button>
           </Form>
         </Modal.Body>
       </Modal>
@@ -258,9 +347,23 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-  changePassword: (credentials: {email: string, name: string, new_password: string, new_password_confirmation: string}) => dispatch({ type: 'CHANGE_PASSWORD', payload: credentials }),
-  registerUser: (credentials: {email: string, name: string, password: string, password_confirmation: string, role: string}) => dispatch({ type: 'REGISTER_USER', payload: credentials }),
-  loginRequest: (credentials: { email: string; password: string }) => dispatch({ type: 'LOGIN_REQUEST', payload: credentials })
+  changePassword: (credentials: {
+    email: string;
+    name: string;
+    new_password: string;
+    new_password_confirmation: string;
+  }) => dispatch({ type: "CHANGE_PASSWORD", payload: credentials }),
+  registerUser: (credentials: {
+    email: string;
+    name: string;
+    password: string;
+    password_confirmation: string;
+    role: string;
+  }) => dispatch({ type: "REGISTER_USER", payload: credentials }),
+  loginRequest: (credentials: { email: string; password: string }) =>
+    dispatch({ type: "LOGIN_REQUEST", payload: credentials }),
+  setRegisterResponse: (message: string) =>
+    dispatch(setRegisterResponse(message)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(WelcomePage);
