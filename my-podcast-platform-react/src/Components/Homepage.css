@@ -1,0 +1,21 @@
+.home-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f5f5dc; 
+  }
+  
+  .home-content {
+    flex: 1; 
+    background-color: #f5f5dc; 
+    text-align: center;
+    color: #002d72; 
+    max-width: 800px;
+    margin: 20px auto; 
+    padding: 20px; 
+  }
+  
+  .navigation-menu {
+    border-bottom: 1px solid black; 
+  }
+  
